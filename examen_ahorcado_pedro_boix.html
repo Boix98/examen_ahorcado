@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ahorcado</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        body {
+            background-color: #00ADB5;
+        }
+
+        .contenedor {
+            height: 100vh;
+            margin: auto;
+            background-color: #00ADB5;
+            padding: 2rem 0;
+        }
+
+        h1 {
+            margin: auto;
+            border: solid;
+            border-width: 5px 0;
+            font-size: 2.1rem;
+            font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+            color: #EEEEEE;
+            text-shadow: 2px 2px 1px black, -2px 2px 1px black, 2px -2px 1px black, -2px -2px 1px black;
+            text-align: center;
+        }
+
+        .principal {
+            margin-top: 5rem;
+        }
+
+        .principal section {
+            margin-top: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            row-gap: 2rem;
+        }
+
+        button:hover {
+            color: #EEEEEE;
+            border-color: #EEE;
+            background-color: #00ADB5;
+        }
+
+        button:active {
+            color: #00ADB5;
+            border-color: #00ADB5;
+            background-color: #EEE;
+        }
+
+        /* Botonera */
+        .botonera {
+            display: flex;
+            flex-direction: column;
+            row-gap: 2.5rem;
+            border: 2px solid;
+            padding: 2rem;
+            background-color: #393E46;
+            color: #EEEEEE;
+            border-radius: 1rem;
+            width: 100%;
+        }
+
+        .botonera label {
+            font-weight: bold;
+        }
+
+        .botonera p {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            column-gap: 2rem;
+        }
+
+        #intentos,
+        #palabra,
+        #comprobar {
+            padding: 5px;
+            border: 2px solid;
+        }
+
+        #intentos {
+            width: 70px;
+        }
+
+        #btn_inicio {
+            font-size: 2rem;
+            padding: 10px;
+            align-self: center;
+            border-radius: 1rem;
+            font-weight: bold;
+        }
+
+        /* Salida de letras */
+        .pantalla {
+            border: 2px solid;
+            padding: 2rem;
+            color: #EEEEEE;
+            background-color: #393E46;
+            border-radius: 1rem;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-around;
+        }
+
+        .letra-oculta {
+            font-size: 2rem;
+            padding: 1rem;
+            border-radius: 1rem;
+            background-color: #EEEEEE;
+            border: 2px solid;
+            color: #00ADB5;
+            text-align: center;
+            margin: .5rem;
+            transition: all .5s linear;
+        }
+
+        /* Comprueba letras */
+        .intro-letra {
+            border: 2px solid;
+            padding: 2rem;
+            background-color: #393E46;
+            color: #EEEEEE;
+            border-radius: 1rem;
+            font-weight: bold;
+        }
+
+        .intro-letra p {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        #comprobar {
+            margin: 0 1rem;
+            width: 70px;
+        }
+
+        #btn_comprobar {
+            padding: 5px;
+            border-radius: 1rem;
+            font-weight: bold;
+        }
+
+        /* Marcador */
+        .marcador {
+            padding: 3rem;
+            border: 2px solid;
+            color: #EEEEEE;
+            background-color: #393E46;
+            border-radius: 1rem;
+            font-size: 2rem;
+        }
+
+        /* Modal */
+        .modal {
+            width: 500px;
+            border-radius: 1rem;
+            padding: 2rem;
+            text-align: center;
+            margin: auto;
+            font-weight: bold;
+            border: 5px solid;
+            transition: .5s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+        }
+
+        .modal h2 {
+            font-size: 3rem;
+        }
+
+        .modal::backdrop {
+            background-color: rgba(0, 0, 0, .7);
+        }
+
+        .modal>div {
+            display: flex;
+            flex-direction: column;
+            row-gap: 1rem;
+        }
+
+        .modal button {
+            padding: 10px;
+            font-weight: bold;
+            font-size: 1.5rem;
+            border-radius: 1rem;
+            margin-right: 2rem;
+        }
+
+        .victoria {
+            background-color: #7cfc00;
+            color: green;
+        }
+
+        .derrota {
+            background-color: red;
+            color: darkred;
+        }
+
+        /* Globos flotantes */
+        .globo-error {
+            width: 300px;
+            padding: 1rem;
+            border-radius: 1rem;
+            bottom: 100%;
+            position: absolute;
+            margin-left: 20px;
+            background-color: rgba(0, 0, 0, .7);
+            font-weight: bold;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+
+            background: rgba(0, 0, 0, .7);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+        }
+
+
+        .globo-error::before {
+            content: '';
+            border-style: solid;
+            position: absolute;
+            top: 100%;
+            border-width: 10px 10px 0 10px;
+            border-color: rgba(0, 0, 0, .7) transparent transparent transparent;
+        }
+
+        .error-texto {
+            width: 270px;
+        }
+
+        .letra-error {
+            right: 0;
+        }
+
+        @media only screen and (min-width: 768px) {
+            body {
+                background-color: #393E46;
+            }
+
+            .contenedor {
+                width: 80vw;
+            }
+
+            h1 {
+                font-size: 3rem;
+                width: 500px;
+            }
+
+            .botonera {
+                width: 500px;
+            }
+
+            .botonera p {
+                flex-direction: row;
+            }
+
+            .globo-error {
+                right: 25%;
+                bottom: initial;
+            }
+
+            .error-texto {
+                right: 50%;
+            }
+
+            .globo-error::before {
+                left: 100%;
+                top: initial;
+                border-width: 10px 0 10px 10px;
+                border-color: transparent transparent transparent rgba(0, 0, 0, .7);
+            }
+
+            .letra-error {
+                right: 44%;
+            }
+        }
+
+        @media only screen and (min-width: 1200px) {
+            .botonera p {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                position: relative;
+            }
+
+            .globo-error {
+                bottom: initial;
+                position: absolute;
+                left: 95%;
+                width: 350px;
+
+            }
+
+            .error-texto {
+                width: 280px;
+            }
+
+            .globo-error::before {
+                border-width: 10px 10px 10px 0;
+                border-color: transparent rgba(0, 0, 0, .7) transparent transparent;
+                right: 100%;
+                left: initial;
+            }
+
+            .letra-error {
+                right: initial;
+                left: 77%;
+            }
+
+        }
+    </style>
+</head>
+
+<body>
+    <div class="contenedor">
+        <header>
+            <h1>Examen Ahorcado</h1>
+        </header>
+        <main class="principal">
+            <section>
+                <div class="botonera">
+                    <p><label for="intentos">Introduce el número de intentos: </label><input type="number"
+                            name="intentos" id="intentos" placeholder="Nº">
+                    </p>
+                    <p><label for="palabra">Introduce un texto: </label><input type="text" name="palabra" id="palabra"
+                            placeholder="Texto...">
+                    </p>
+                    <button id="btn_inicio">¡Empezar!</button>
+                </div>
+                <div class="pantalla"></div>
+                <div class="intro-letra">
+                    <p><label for="comprobar">Introduce una letra para comprobar: </label><input type="text"
+                            name="comprobar" id="comprobar" maxlength="1" placeholder="Letra..."><button
+                            id="btn_comprobar">Comprueba</button>
+                    </p>
+                </div>
+                <div class="marcador">
+                    <p>Número de intentos usados: <span id="intentos_usados"></span>. Quedan: <span
+                            id="intentos_restantes"></span></p>
+                    <p>Letras falladas: <span id="letras_falladas"></span>. Quedan: <span id="letras_restantes"></span>
+                    </p>
+                    <p>Letras adivinadas: <span id="letras_adivinadas"></span></p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        let palabra = '';
+        let palabra_oculta = '';
+        let intentos = 0;
+        let contador = 0;
+        let letras_falladas = [];
+        let letras_adivinadas = [];
+        let n_letras = 0;
+
+        document.querySelector('.marcador').style.display = 'none';
+        document.querySelector('.intro-letra').style.display = 'none';
+        document.querySelector('.pantalla').style.display = 'none';
+
+        function iniciaJuego() {
+            palabra = '';
+            intentos = 0;
+            let cuadro_intentos = document.getElementById('intentos');
+            intentos = cuadro_intentos.value;
+            let cuadro_palabra = document.getElementById('palabra');
+            palabra = cuadro_palabra.value;
+            palabra = corrigePalabras(palabra);
+            if (intentos <= 0 || intentos == undefined || palabra == ' ' || palabra == '' || !isNaN(palabra)) {
+                if (intentos <= 0 || intentos == '' || intentos == undefined) {
+                    cuadro_intentos.value = '';
+                    if (document.querySelector('.intentos-error')) {
+                        document.querySelector('.intentos-error').remove();
+                    }
+                    let globo = document.createElement('span');
+                    globo.className = 'globo-error intentos-error';
+                    globo.textContent = 'Tienes que introducir al menos un intento';
+                    globo.style.display = 'flex';
+                    document.querySelector('.botonera p:first-child').append(globo);
+                    cuadro_intentos.style.borderColor = 'red';
+                    cuadro_intentos.onclick = () => {
+                        cuadro_intentos.style.borderColor = 'initial'
+                        if (document.querySelector('.intentos-error')) {
+                            document.querySelector('.intentos-error').remove();
+                        }
+                    }
+                }
+                if (palabra == ' ' || palabra == '' || !isNaN(palabra)) {
+                    let mensaje = '';
+                    if (palabra == ' ' || palabra == '') {
+                        mensaje = 'No puedes dejar el texto vacio';
+
+                    } else if (!isNaN(palabra)) {
+                        mensaje = 'Solo puedes introducir letras';
+                    }
+                    cuadro_palabra.value = '';
+                    if (document.querySelector('.error-texto')) {
+                        document.querySelector('.error-texto').remove();
+                    }
+                    let globo = document.createElement('span');
+                    globo.className = 'globo-error error-texto';
+                    globo.textContent = mensaje;
+                    globo.style.display = 'flex';
+                    document.querySelector('.botonera p:last-of-type').append(globo);
+                    cuadro_palabra.style.borderColor = 'red';
+                    cuadro_palabra.onclick = () => {
+                        cuadro_palabra.style.borderColor = 'initial'
+                        if (document.querySelector('.error-texto')) {
+                            document.querySelector('.error-texto').remove();
+                        }
+                    }
+                }
+
+            } else {
+                cuadro_palabra.value = '';
+                cuadro_intentos.value = '';
+                palabra_oculta = '';
+                document.querySelector('.botonera').style.display = 'none';
+                for (let i = 0; i < palabra.length; i++) {
+                    if (palabra[i] == ' ') {
+                        palabra_oculta += ' ';
+                    } else {
+                        n_letras++;
+                        palabra_oculta += '_';
+                    }
+                }
+
+                muestraPantalla();
+                document.querySelector('.marcador').style.display = 'initial';
+                document.querySelector('.intro-letra').style.display = 'initial';
+                document.querySelector('.pantalla').style.display = 'flex';
+            }
+        }
+
+
+        document.getElementById('btn_inicio').onclick = iniciaJuego;
+
+        function compruebaLetra() {
+            let letra_correcta = false;
+            let n_letras_adivinadas = 0;
+            let cuadro_letra = document.getElementById('comprobar');
+            let letra = cuadro_letra.value;
+            if (letra == ' ' || letra == '' || !isNaN(letra)) {
+                let mensaje = '';
+                if (letra == ' ' || letra == '') {
+                    mensaje = 'No puedes dejar la letra en blanco';
+                } else if (!isNaN(letra)) {
+                    mensaje = 'Solo puedes introducir letras';
+                }
+                if (document.querySelector('.letra-error')) {
+                    document.querySelector('.letra-error').remove();
+                }
+                cuadro_letra.value = '';
+                let globo = document.createElement('span');
+                globo.className = 'globo-error letra-error';
+                globo.textContent = mensaje;
+                document.querySelector('.intro-letra p').append(globo);
+                cuadro_letra.style.borderColor = 'red';
+                globo.style.display = 'flex';
+                cuadro_letra.onclick = () => {
+                    cuadro_letra.style.borderColor = 'initial';
+                    if (document.querySelector('.letra-error')) {
+                        document.querySelector('.letra-error').remove();
+                    }
+                }
+            } else {
+                letra = quitaTildes(letra);
+                cuadro_letra.value = '';
+                cuadro_letra.focus();
+                let letra_oculta = document.querySelectorAll('.letra-oculta');
+                let nueva_oculta = '';
+
+                for (let i = 0; i < palabra.length; i++) {
+                    if (letra == palabra[i]) {
+                        nueva_oculta += letra;
+                        n_letras_adivinadas++;
+                        letra_correcta = true;
+                    } else {
+                        nueva_oculta += palabra_oculta[i];
+                    }
+                }
+                if (letra_correcta) {
+                    if (letras_adivinadas.indexOf(letra) == -1) {
+                        letras_adivinadas.push(letra);
+                        n_letras -= n_letras_adivinadas;
+                    } else {
+                        alert('¡Letra repetida! La letra ya la habias adivinado.');
+                    }
+                } else {
+                    if (letras_falladas.indexOf(letra) == -1) {
+                        letras_falladas.push(letra);
+                        intentos--;
+                        contador++;
+                    } else {
+                        alert('¡Letra repetida! Ya habias probado esta letra.');
+                    }
+
+                }
+                palabra_oculta = nueva_oculta;
+                muestraPantalla(letra);
+            }
+
+        }
+        document.getElementById('btn_comprobar').onclick = compruebaLetra;
+
+        function muestraPantalla(letra) {
+            let salida = document.querySelector('.pantalla');
+            salida.innerHTML = '';
+            let contenedor_letras = document.createElement('div');
+            for (let i = 0; i < palabra.length; i++) {
+                let span = document.createElement('span');
+                span.className = 'letra-oculta';
+                if (palabra_oculta[i] == ' ') {
+                    span.style.backgroundColor = 'darkgrey';
+                }
+                span.textContent = palabra_oculta[i].toUpperCase();
+                contenedor_letras.append(span);
+            }
+            salida.append(contenedor_letras);
+            document.getElementById('intentos_usados').textContent = contador;
+            document.getElementById('intentos_restantes').textContent = intentos;
+            document.getElementById('letras_falladas').textContent = letras_falladas;
+            document.getElementById('letras_restantes').textContent = n_letras;
+            document.getElementById('letras_adivinadas').textContent = letras_adivinadas;
+
+            if (n_letras == 0) {
+                hasGanado();
+            } else if (intentos == 0) {
+                hasPerdido();
+            }
+        }
+
+
+        function hasGanado() {
+            let modal = document.createElement('dialog');
+            modal.className = 'modal victoria';
+            let contenedor = document.createElement('div');
+            let titulo = document.createElement('h2');
+            titulo.textContent = '¡Has ganado!';
+            let parrafo = document.createElement('p');
+            parrafo.textContent = '¿Quieres volver a jugar?';
+            let botones = document.createElement('div');
+            let btn_reiniciar = document.createElement('button');
+            btn_reiniciar.textContent = 'Reiniciar';
+            btn_reiniciar.onclick = function () {
+                reiniciaJuego();
+            }
+            let btn_cerrar = document.createElement('button');
+            btn_cerrar.textContent = 'Cerrar';
+            btn_cerrar.onclick = cierraJuego;
+            botones.append(btn_reiniciar, btn_cerrar);
+            contenedor.append(titulo, parrafo, botones);
+            modal.append(contenedor);
+            document.body.append(modal);
+            document.querySelector('.modal').style.transform = 'scale(0)';
+            document.querySelector('.modal').showModal();
+            document.querySelector('.modal').style.transform = 'scale(1)';
+
+        }
+
+        function hasPerdido() {
+            let modal = document.createElement('dialog');
+            modal.className = 'modal derrota';
+            let contenedor = document.createElement('div');
+            let titulo = document.createElement('h2');
+            titulo.textContent = 'Has perdido';
+            let parrafo = document.createElement('p');
+            parrafo.textContent = '¿Quieres volver a jugar?';
+            let botones = document.createElement('div');
+            let btn_reiniciar = document.createElement('button');
+            btn_reiniciar.textContent = 'Reiniciar';
+            btn_reiniciar.onclick = function () {
+                reiniciaJuego();
+            }
+            let btn_cerrar = document.createElement('button');
+            btn_cerrar.textContent = 'Cerrar';
+            btn_cerrar.onclick = cierraJuego;
+            botones.append(btn_reiniciar, btn_cerrar);
+            contenedor.append(titulo, parrafo, botones);
+            modal.append(contenedor);
+            document.body.append(modal);
+            document.querySelector('.modal').style.transform = 'scale(0)';
+            document.querySelector('.modal').showModal();
+            document.querySelector('.modal').style.transform = 'scale(1)';
+        }
+
+        function cierraJuego() {
+            if (confirm('¿Seguro que quieres cerrar el juego?')) {
+                window.close();
+            }
+        }
+
+        function reiniciaJuego() {
+            document.querySelector('.pantalla').innerHTML = '';
+            palabra = '';
+            palabra_oculta = '';
+            intentos = 0;
+            contador = 0;
+            letras_falladas = [];
+            letras_adivinadas = [];
+            n_letras = 0;
+            document.querySelector('.modal').remove();
+            document.querySelector('.botonera').style.display = 'flex';
+            document.querySelector('.marcador').style.display = 'none';
+            document.querySelector('.intro-letra').style.display = 'none';
+            document.querySelector('.pantalla').style.display = 'none';
+            document.getElementById('intentos_usados').textContent = '';
+            document.getElementById('intentos_restantes').textContent = '';
+            document.getElementById('letras_falladas').textContent = '';
+            document.getElementById('letras_restantes').textContent = '';
+            document.getElementById('letras_adivinadas').textContent = '';
+        }
+
+        function corrigePalabras(texto) {
+            texto = quitaEspacios(texto);
+            let sin_tildes = '';
+            for (let cada_letra of texto) {
+                cada_letra = quitaTildes(cada_letra);
+                sin_tildes += cada_letra;
+            }
+            return sin_tildes;
+        }
+
+        function quitaEspacios(texto) {
+            texto = texto.trim();
+            while (texto.indexOf('  ') != -1) {
+                texto = texto.replace('  ', ' ');
+            }
+            return texto;
+        }
+        function quitaTildes(letra) {
+            let nuevo_texto = '';
+            letra = letra.toLowerCase();
+            switch (letra) {
+                case 'à':
+                case 'á':
+                    letra = 'a'
+                    break;
+                case 'è':
+                case 'é':
+                    letra = 'e'
+                    break;
+                case 'ì':
+                case 'í':
+                    letra = 'i'
+                    break;
+                case 'ò':
+                case 'ó':
+                    letra = 'o'
+                    break;
+                case 'ù':
+                case 'ú':
+                    letra = 'u'
+                    break;
+                default:
+                    break;
+            }
+            return letra;
+        }
+    </script>
+</body>
+
+</html>
